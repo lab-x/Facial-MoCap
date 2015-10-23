@@ -1,43 +1,36 @@
 #include "opencv\highgui.h"
+#include "FaceTrack.h"
+#include "WebCam.h"
 #include <iostream>
 
 using namespace cv;
-using namespace std;
 
 int main(int argc, char* argv[])
 {
-	VideoCapture cap(0); // open the video camera no. 0
+	WebCam* cam = new WebCam(0);
+	//Initialize capture of Webcam
 
-	if (!cap.isOpened())  // if not success, exit program
+	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window called "MyVideo"
+
+#pragma region Inital Face Finding
 	{
-		cout << "Cannot open the video cam" << endl;
-		return -1;
+		//TODO: Find a face using Haar and then calculate good features to track on the face
+		Mat firstFrame = cam->getFrame();
 	}
-
-	double dWidth = cap.get(CV_CAP_PROP_FRAME_WIDTH); //get the width of frames of the video
-	double dHeight = cap.get(CV_CAP_PROP_FRAME_HEIGHT); //get the height of frames of the video
-
-	std::cout << "Frame size : " << dWidth << " x " << dHeight << endl;
-
-	namedWindow("MyVideo", CV_WINDOW_AUTOSIZE); //create a window called "MyVideo"
+#pragma endregion
 
 	while (1)
 	{
-		Mat frame;
+		//Where captured frame resides
+		Mat frame = cam->getFrame();
 
-		bool bSuccess = cap.read(frame); // read a new frame from video
+		//show the frame in "Face Tracker" window
+		imshow("Face Tracker", frame);
 
-		if (!bSuccess) //if not success, break loop
+		//wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+		if (waitKey(30) == 27)
 		{
-			cout << "Cannot read a frame from video stream" << endl;
-			break;
-		}
-
-		imshow("MyVideo", frame); //show the frame in "MyVideo" window
-
-		if (waitKey(30) == 27) //wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-		{
-			cout << "esc key is pressed by user" << endl;
+			std::cout << "esc key is pressed by user" << std::endl;
 			break;
 		}
 	}

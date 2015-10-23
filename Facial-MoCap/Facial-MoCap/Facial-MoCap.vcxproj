@@ -149,7 +149,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FaceTrack.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="OpticalFlow.cpp" />
+    <ClCompile Include="WebCam.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FaceTrack.h" />
+    <ClInclude Include="OpticalFlow.h" />
+    <ClInclude Include="WebCam.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
