@@ -2,9 +2,7 @@
 
 WebCam::WebCam(int camIndex)
 {
-	VideoCapture capture(0); // open the video camera no. 0
-
-	cap = capture;
+	cap = VideoCapture(0); // open the video camera no. 0
 
 	if (!cap.isOpened())  // if not success, exit program
 	{

@@ -15,8 +15,8 @@ bool FaceTrack::HaarFaceDetect(Mat *frame)
 	Mat original = frame->clone();
 	//Convert to grayscale
 	Mat gray;
-	cvtColor(original, gray, CV_BGR2GRAY);
+	cv::cvtColor(original, gray, CV_BGR2GRAY);
 	//Find faces in frame
-	vector< Rect_<int>> faces;
+	std::vector< Rect_<int> > faces;
 	return true;
 }
