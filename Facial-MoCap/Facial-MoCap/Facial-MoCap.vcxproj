@@ -157,7 +157,6 @@
   <ItemGroup>
     <ClCompile Include="Delaunay.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="OpticalFlow.cpp" />
     <ClCompile Include="WebCam.cpp" />
   </ItemGroup>
   <ItemGroup>

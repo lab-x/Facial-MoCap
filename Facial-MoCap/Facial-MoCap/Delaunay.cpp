@@ -1,6 +1,8 @@
 #include "Delaunay.h"
 
-
+//Definition of statics
+Scalar Delaunay::activeColor = Scalar(0, 0, 255);
+Scalar Delaunay::delaunayColor = Scalar(255, 255, 255);
 
 Delaunay::Delaunay()
 {
@@ -12,13 +14,13 @@ Delaunay::~Delaunay()
 }
 
 //Draw the point in space onto the matrix representation of the image
-void Delaunay::drawSubdivPoint(Mat & img, Point2f fp, Scalar color)
+void Delaunay::drawSubdivPoint(Mat & img, Point2f fp)
 {
-	cv::circle(img, fp, 3, color, cv::FILLED, cv::LINE_8, 0);
+	cv::circle(img, fp, 3, activeColor, cv::FILLED, cv::LINE_8, 0);
 }
 
 //
-void Delaunay::drawSubdiv(Mat & img, Subdiv2D & subdiv, Scalar delaunayColor)
+void Delaunay::drawSubdiv(Mat & img, Subdiv2D & subdiv)
 {
 #if 1
 	std::vector<cv::Vec6f> triangleList;
@@ -51,7 +53,7 @@ void Delaunay::drawSubdiv(Mat & img, Subdiv2D & subdiv, Scalar delaunayColor)
 #endif
 }
 
-void Delaunay::locatePoint(Mat & img, Subdiv2D & subdiv, Point2f fp, Scalar activeColor)
+void Delaunay::locatePoint(Mat & img, Subdiv2D & subdiv, Point2f fp)
 {
 	int e0 = 0, vertex = 0;
 
@@ -70,7 +72,7 @@ void Delaunay::locatePoint(Mat & img, Subdiv2D & subdiv, Point2f fp, Scalar acti
 		} while (e != e0);
 	}
 
-	drawSubdivPoint(img, fp, activeColor);
+	drawSubdivPoint(img, fp);
 }
 
 void Delaunay::paintVoronoi(Mat & img, Subdiv2D & subdiv)

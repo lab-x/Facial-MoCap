@@ -1,2 +1,2 @@
 # Facial-MoCap
-Uses OpenCV 2.4.9
+Uses OpenCV 3.0

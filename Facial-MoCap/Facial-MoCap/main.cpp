@@ -1,13 +1,13 @@
 #include "opencv\highgui.h"
-#include "FaceTrack.h"
 #include "WebCam.h"
+#include "Delaunay.h"
 #include <iostream>
 #include <opencv2\imgproc\types_c.h>
 
 using namespace cv;
 
 //Some globals :(
-WebCam *cam;
+static WebCam *cam = new WebCam(0);
 
 void warpTextureFromTriangle(Point2f srcTri[3], Mat originalImage, Point2f dstTri[3], Mat warp_final)
 {
@@ -149,24 +149,10 @@ void drawPts(Mat pcaset, PCA pca, PCA pcaTexture, std::vector<CvPoint>& pointsIn
 	}
 }
 
-Subdiv2D* initDelaunay(CvMemStorage* storage, CvRect rect)
-{
-	Scalar activeFacetColor(0, 0, 255), delaunayColor(255, 255, 255);
-	Rect rect(0, 0, 600, 600);
-
-	Subdiv2D* subdiv = new Subdiv2D(rect);
-	return subdiv;
-}
-
-void drawSubdivEdge(Mat* img, Subdiv2D)
-
 int main(int argc, char* argv[])
 {
-	WebCam* cam = new WebCam(0);
 	//Initialize capture of Webcam
-
-	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window called "MyVideo"
-
+	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
 #pragma region Inital Face Finding
 	{
 		//TODO: Find a face using Haar and then calculate good features to track on the face

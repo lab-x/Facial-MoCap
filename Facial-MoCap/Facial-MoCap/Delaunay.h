@@ -13,15 +13,19 @@ using cv::Point2f;
 using cv::Scalar;
 using cv::Subdiv2D;
 
-static class Delaunay
+class Delaunay
 {
 public:
 	Delaunay();
 	~Delaunay();
 
-	static void drawSubdivPoint(Mat& img, Point2f fp, Scalar color);
-	static void drawSubdiv(Mat& img, Subdiv2D& subdiv, Scalar delaunayColor);
-	static void locatePoint(Mat& img, Subdiv2D& subdiv, Point2f fp, Scalar activeColor);
+	static void drawSubdivPoint(Mat& img, Point2f fp);
+	static void drawSubdiv(Mat& img, Subdiv2D& subdiv);
+	static void locatePoint(Mat& img, Subdiv2D& subdiv, Point2f fp);
 	static void paintVoronoi(Mat& img, Subdiv2D& subdiv);
+
+private:
+	static Scalar activeColor;
+	static Scalar delaunayColor;
 };
 
