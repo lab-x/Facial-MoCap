@@ -18,24 +18,21 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FaceTrack.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OpticalFlow.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="WebCam.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Delaunay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FaceTrack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OpticalFlow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WebCam.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Delaunay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

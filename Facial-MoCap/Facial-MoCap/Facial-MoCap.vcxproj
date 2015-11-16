@@ -155,13 +155,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FaceTrack.cpp" />
+    <ClCompile Include="Delaunay.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="OpticalFlow.cpp" />
     <ClCompile Include="WebCam.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FaceTrack.h" />
+    <ClInclude Include="Delaunay.h" />
     <ClInclude Include="OpticalFlow.h" />
     <ClInclude Include="WebCam.h" />
   </ItemGroup>
