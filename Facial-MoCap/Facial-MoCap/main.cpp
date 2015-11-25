@@ -155,7 +155,8 @@ int main(int argc, char* argv[])
 	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
 #pragma region Inital Face Finding
 	{
-		//TODO: Find a face using Haar and then calculate good features to track on the face
+		Delaunay::runSample();
+		//PCA pcaset = loadPCA();
 		Mat firstFrame = cam->getFrame();
 	}
 #pragma endregion

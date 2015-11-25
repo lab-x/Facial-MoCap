@@ -6,6 +6,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include "opencv\highgui.h"
 
 //usings
 using cv::Mat;
@@ -23,6 +24,8 @@ public:
 	static void drawSubdiv(Mat& img, Subdiv2D& subdiv);
 	static void locatePoint(Mat& img, Subdiv2D& subdiv, Point2f fp);
 	static void paintVoronoi(Mat& img, Subdiv2D& subdiv);
+	static void help();
+	static void runSample();
 
 private:
 	static Scalar activeColor;

@@ -101,3 +101,56 @@ void Delaunay::paintVoronoi(Mat & img, Subdiv2D & subdiv)
 		cv::circle(img, centers[i], 3, Scalar(), cv::FILLED, cv::LINE_AA, 0);
 	}
 }
+
+void Delaunay::help()
+{
+	std::cout << "\nThis program demostrates iterative construction of\n"
+		"delaunay triangulation and voronoi tesselation.\n"
+		"It draws a random set of points in an image and then delaunay triangulates them.\n"
+		"Usage: \n"
+		"./delaunay \n"
+		"\nThis program builds the traingulation interactively, you may stop this process by\n"
+		"hitting any key.\n";
+}
+
+void Delaunay::runSample()
+{
+	help();
+
+	Scalar active_facet_color(0, 0, 255), delaunay_color(255, 255, 255);
+	cv::Rect rect(0, 0, 600, 600);
+
+	Subdiv2D subdiv(rect);
+	Mat img(rect.size(), CV_8UC3);
+
+	img = Scalar::all(0);
+	std::string win = "Delaunay Demo";
+	imshow(win, img);
+
+	for (int i = 0; i < 200; i++)
+	{
+		Point2f fp((float)(rand() % (rect.width - 10) + 5),
+			(float)(rand() % (rect.height - 10) + 5));
+
+		locatePoint(img, subdiv, fp);
+		imshow(win, img);
+
+		if (cv::waitKey(100) >= 0)
+			break;
+
+		subdiv.insert(fp);
+
+		img = Scalar::all(0);
+		drawSubdiv(img, subdiv);
+		imshow(win, img);
+
+		if (cv::waitKey(100) >= 0)
+			break;
+	}
+
+	img = Scalar::all(0);
+	paintVoronoi(img, subdiv);
+	imshow(win, img);
+
+	cv::waitKey(0);
+}
