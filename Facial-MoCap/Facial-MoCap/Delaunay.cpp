@@ -1,11 +1,11 @@
 #include "Delaunay.h"
 
 //Definition of statics
-Scalar Delaunay::activeColor = Scalar(0, 0, 255);
-Scalar Delaunay::delaunayColor = Scalar(255, 255, 255);
-
-Delaunay::Delaunay()
+Delaunay::Delaunay(string filePath)
 {
+	calcMeanMask(filePath);
+	activeColor = Scalar(0, 0, 255);
+	delaunayColor = Scalar(255, 0, 0);
 }
 
 
@@ -19,10 +19,10 @@ void Delaunay::drawSubdivPoint(Mat & img, Point2f fp)
 	cv::circle(img, fp, 3, activeColor, cv::FILLED, cv::LINE_8, 0);
 }
 
-//
 void Delaunay::drawSubdiv(Mat & img, Subdiv2D & subdiv)
 {
 #if 1
+	bool draw;
 	std::vector<cv::Vec6f> triangleList;
 	subdiv.getTriangleList(triangleList);
 	std::vector<cv::Point> pt(3);
@@ -33,11 +33,18 @@ void Delaunay::drawSubdiv(Mat & img, Subdiv2D & subdiv)
 		pt[0] = cv::Point(cvRound(t[0]), cvRound(t[1]));
 		pt[1] = cv::Point(cvRound(t[2]), cvRound(t[3]));
 		pt[2] = cv::Point(cvRound(t[4]), cvRound(t[5]));
+		draw = true;
 
-		//draw lines
-		cv::line(img, pt[0], pt[1], delaunayColor, 1, cv::LINE_AA, 0);
-		cv::line(img, pt[1], pt[2], delaunayColor, 1, cv::LINE_AA, 0);
-		cv::line(img, pt[2], pt[0], delaunayColor, 1, cv::LINE_AA, 0);
+		for (size_t j = 0; j < 3; j++)
+			if (pt[j].x>img.cols || pt[j].y>img.rows || pt[j].x < 0 || pt[j].y < 0)
+				draw = false;
+		if (draw)
+		{
+			//draw lines
+			cv::line(img, pt[0], pt[1], delaunayColor, 1, cv::LINE_AA, 0);
+			cv::line(img, pt[1], pt[2], delaunayColor, 1, cv::LINE_AA, 0);
+			cv::line(img, pt[2], pt[0], delaunayColor, 1, cv::LINE_AA, 0);
+		}
 	}
 #else
 
@@ -53,7 +60,7 @@ void Delaunay::drawSubdiv(Mat & img, Subdiv2D & subdiv)
 #endif
 }
 
-void Delaunay::locatePoint(Mat & img, Subdiv2D & subdiv, Point2f fp)
+void Delaunay::locatePoint(Mat & img, Point2f fp)
 {
 	int e0 = 0, vertex = 0;
 
@@ -72,7 +79,7 @@ void Delaunay::locatePoint(Mat & img, Subdiv2D & subdiv, Point2f fp)
 		} while (e != e0);
 	}
 
-	drawSubdivPoint(img, fp);
+	drawSubdivPoint(img, fp, activeColor);
 }
 
 void Delaunay::paintVoronoi(Mat & img, Subdiv2D & subdiv)
@@ -117,7 +124,6 @@ void Delaunay::runSample()
 {
 	help();
 
-	Scalar active_facet_color(0, 0, 255), delaunay_color(255, 255, 255);
 	cv::Rect rect(0, 0, 600, 600);
 
 	Subdiv2D subdiv(rect);
@@ -153,4 +159,125 @@ void Delaunay::runSample()
 	imshow(win, img);
 
 	cv::waitKey(0);
+}
+
+void Delaunay::drawSample()
+{
+	help();
+
+	Mat img = cv::imread("../../media/IMM/01-6m.jpg", 1);
+	if (img.empty())
+	{
+		std::cout << "Could not read image!" << std::endl;
+		return;
+	}
+	cv::Rect rect(0, 0, img.cols, img.rows);
+
+	Subdiv2D subdiv(rect);
+
+	std::string win = "Image Overlay";
+	std::ifstream in("../../media/IMM/01-6m.asf");
+	int pointNum;
+	std::string line;
+	while (std::getline(in, line))
+	{
+		if (line[0] != '#' && line != "")
+		{
+			std::istringstream iss(line);
+			iss >> pointNum;
+			break;
+		}
+	}
+	int tmp = 0;
+	for (unsigned i = 0; i < pointNum; i++)
+	{
+		while (std::getline(in, line))
+		{
+			if (line[0] != '#' && line != "")
+				break;
+		}
+		std::istringstream iss(line);
+		Point2f point;
+		iss >> tmp;
+		iss >> tmp;
+		iss >> point.x;
+		point.x *= img.cols;
+		iss >> point.y;
+		point.y *= img.rows;
+		subdiv.insert(point);
+	}
+	drawSubdiv(img, subdiv);
+	cv::imshow(win, img);
+	iterate(&subdiv);
+}
+
+void Delaunay::drawMask(Mat img, int numFeatures)
+{
+	std::string win = "Face Tracker";
+	cv::Rect rect(0, 0, img.cols, img.rows);
+	Subdiv2D subdiv(rect);
+	for (unsigned i = 0; i < numFeatures; i++)
+	{
+		Point2f point;
+		//TODO: Find points that correspond to statistical 
+		// model and pass them into here efficiently
+		point.x *= img.cols;
+		point.y *= img.rows;
+		subdiv.insert(point);
+	}
+	drawSubdiv(img, subdiv);
+	cv::imshow(win, img);
+}
+
+void Delaunay::calcMeanMask(string filePath)
+{
+	Mat img = cv::imread(filePath + ".jpg", 1);
+	if (img.empty())
+	{
+		std::cout << "Could not read image!" << std::endl;
+		return;
+	}
+	cv::Rect rect(0, 0, img.cols, img.rows);
+
+	Subdiv2D subdiv(rect);
+
+	std::ifstream in(filePath + ".asf");
+	int pointNum;
+	string line;
+	while (std::getline(in, line))
+	{
+		if (line[0] != '#' && line != "")
+		{
+			std::istringstream iss(line);
+			iss >> pointNum;
+			break;
+		}
+	}
+	int tmp = 0;
+	for (unsigned i = 0; i < pointNum; i++)
+	{
+		while (std::getline(in, line))
+		{
+			if (line[0] != '#' && line != "")
+				break;
+		}
+		std::istringstream iss(line);
+		Point2f point;
+		iss >> tmp;
+		iss >> tmp;
+		iss >> point.x;
+		point.x *= img.cols;
+		iss >> point.y;
+		point.y *= img.rows;
+		subdiv.insert(point);
+	}
+}
+
+void Delaunay::iterate(Mat img)
+{
+	CvPoint buf[3];
+
+	vector<Vec6f> triangles = vector<Vec6f>();
+
+	subdiv->getTriangleList(triangles);
 }

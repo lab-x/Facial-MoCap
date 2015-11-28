@@ -2,12 +2,25 @@
 #include "WebCam.h"
 #include "Delaunay.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <opencv2\imgproc\types_c.h>
 
 using namespace cv;
+using std::string;
 
 //Some globals :(
 static WebCam *cam = new WebCam(0);
+
+//Path to images and annotations
+const string path = "../../media/IMM/";
+
+//Annotation files used
+const string annotations[6] = {
+	"01-1m.asf", "01-2m.asf", "01-3m.asf",
+	"01-4m.asf", "01-5m.asf", "01-6m.asf"
+};
 
 void warpTextureFromTriangle(Point2f srcTri[3], Mat originalImage, Point2f dstTri[3], Mat warp_final)
 {
@@ -39,25 +52,42 @@ void warpTextureFromTriangle(Point2f srcTri[3], Mat originalImage, Point2f dstTr
 	warp_dst.copyTo(warp_final, warp_mask);
 }
 
-PCA loadPCA(const char* fileName, int& rows, int& cols, Mat& pcaset)
+PCA loadPCA(Mat& pcaset)
 {
-	FILE* in = fopen(fileName, "r");
-	int a;
-	fscanf(in, "%d%d", &rows, &cols);
-
-	pcaset = Mat::eye(rows, cols, CV_64F);
-
-	for (int i = 0; i < rows; i++)
+	int cols = 58 * 2;
+	pcaset = cv::Mat::eye(6, cols, CV_64F);
+	for (unsigned i = 0; i < 6; i++)
 	{
-		for (int j = 0; j < cols; j++)
+		std::ifstream in(path + annotations[i]);
+		int pointNum;
+		string line;
+		while (std::getline(in, line))
 		{
-			fscanf(in, "%d", &a);
-			pcaset.at<double>(i, j) = a;
+			if (line[0] != '#' && line != "")
+			{
+				std::istringstream iss(line);
+				iss >> pointNum;
+				break;
+			}
+		}
+		int tmp = 0;
+		for (unsigned j = 0; j < 58 * 2; j += 2)
+		{
+			while (std::getline(in, line))
+			{
+				if (line[0] != '#' && line != "")
+					break;
+			}
+			std::istringstream iss(line);
+			iss >> tmp;
+			iss >> tmp;
+			iss >> pcaset.at<double>(i, j);
+			iss >> pcaset.at<double>(i, j + 1);
 		}
 	}
 	std::cout << pcaset << std::endl;
 
-	PCA pca(pcaset, Mat(), CV_PCA_DATA_AS_ROW, pcaset.cols);
+	PCA pca(pcaset, cv::Mat(), CV_PCA_DATA_AS_ROW, pcaset.cols);
 	return pca;
 }
 
@@ -155,8 +185,8 @@ int main(int argc, char* argv[])
 	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
 #pragma region Inital Face Finding
 	{
-		Delaunay::runSample();
-		//PCA pcaset = loadPCA();
+		Delaunay::drawSample();
+		PCA pca = loadPCA(Mat());
 		Mat firstFrame = cam->getFrame();
 	}
 #pragma endregion

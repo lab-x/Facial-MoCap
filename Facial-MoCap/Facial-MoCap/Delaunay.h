@@ -6,29 +6,42 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include "opencv\highgui.h"
 
 //usings
+using std::vector;
+using std::string;
 using cv::Mat;
 using cv::Point2f;
 using cv::Scalar;
 using cv::Subdiv2D;
+using cv::Vec6f;
 
 class Delaunay
 {
 public:
-	Delaunay();
+	Delaunay(string filePath);
 	~Delaunay();
 
-	static void drawSubdivPoint(Mat& img, Point2f fp);
-	static void drawSubdiv(Mat& img, Subdiv2D& subdiv);
-	static void locatePoint(Mat& img, Subdiv2D& subdiv, Point2f fp);
+	void drawSubdiv(Mat& img, Subdiv2D& subdiv);
+	void locatePoint(Mat& img, Point2f fp);
+	void drawMask(Mat img, int numFeatures);
+	void calcMeanMask(string filePath);
+	//Draw the point of the subdivision onto the image
+	void drawSubdivPoint(Mat& img, Point2f fp);
 	static void paintVoronoi(Mat& img, Subdiv2D& subdiv);
 	static void help();
 	static void runSample();
+	static void drawSample();
 
 private:
-	static Scalar activeColor;
-	static Scalar delaunayColor;
-};
+	Scalar activeColor;
+	Scalar delaunayColor;
 
+	Subdiv2D
+
+	vector<Vec6f> meanMask;
+};
