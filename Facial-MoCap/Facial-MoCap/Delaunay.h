@@ -59,7 +59,7 @@ public:
 	void warpTextureFromTriangles(Subdiv2D & srcSubDiv, Mat& originalImg, Mat& warp_final);
 
 	//Creates a subdivision based on annotation data
-	Subdiv2D findSubdiv(string filePath);
+	static Subdiv2D findSubdiv(string filePath);
 
 //Static Sample Delaunay functionality demos
 	//Provides a quick overview of the Delaunay functions when run.

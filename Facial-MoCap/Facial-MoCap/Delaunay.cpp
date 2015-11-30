@@ -153,13 +153,12 @@ vector<Point2f[3]>* Delaunay::makeTrianglePointsVector(Subdiv2D& subdiv)
 		}
 		else
 		{
-			out->at(j)[0] = cv::Point(cvRound(in[i][0]), cvRound(in[i][1]));
-			out->at(j)[1] = cv::Point(cvRound(in[i][2]), cvRound(in[i][3]));
-			out->at(j)[2] = cv::Point(cvRound(in[i][4]), cvRound(in[i][5]));
-			++j;
+			out->at(i)[0] = cv::Point(cvRound(in[i][0]), cvRound(in[i][1]));
+			out->at(i)[1] = cv::Point(cvRound(in[i][2]), cvRound(in[i][3]));
+			out->at(i)[2] = cv::Point(cvRound(in[i][4]), cvRound(in[i][5]));
+			//++j;
 		}
 	}
-
 	return out;
 }
 
