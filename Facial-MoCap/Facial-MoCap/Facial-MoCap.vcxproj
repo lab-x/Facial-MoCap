@@ -157,10 +157,12 @@
   <ItemGroup>
     <ClCompile Include="Delaunay.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TrainingImage.cpp" />
     <ClCompile Include="WebCam.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Delaunay.h" />
+    <ClInclude Include="TrainingImage.h" />
     <ClInclude Include="WebCam.h" />
   </ItemGroup>
   <ItemGroup>

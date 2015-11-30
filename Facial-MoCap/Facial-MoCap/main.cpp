@@ -185,7 +185,8 @@ int main(int argc, char* argv[])
 	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
 #pragma region Inital Face Finding
 	{
-		Delaunay::warpSample("../../media/IMM/01-2m", "../../media/IMM/01-2m");
+		Delaunay::drawSample("../../media/IMM/01-1m");
+		Delaunay::drawSample("../../media/IMM/01-6m");
 		PCA pca = loadPCA(Mat());
 		Mat firstFrame = cam->getFrame();
 	}

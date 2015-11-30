@@ -1,21 +1,14 @@
 #include "Delaunay.h"
 
+Scalar Delaunay::activeColor = Scalar(0, 255, 0);
+Scalar Delaunay::delaunayColor = Scalar(255, 0, 0);
+
 Delaunay::Delaunay()
 {
-	delaunayColor = Scalar(255, 0, 0);
 }
-
-//Definition of statics
-Delaunay::Delaunay(string filePath)
-{
-	calcMeanMask(filePath);
-	delaunayColor = Scalar(255, 0, 0);
-}
-
 
 Delaunay::~Delaunay()
 {
-	delete meanMask;
 }
 
 //Draw the point in space onto the matrix representation of the image
@@ -132,66 +125,6 @@ void Delaunay::drawMask(Mat& img, int numFeatures)
 	cv::imshow(win, img);
 }
 
-void Delaunay::calcMeanMask(string filePath)
-{
-	Subdiv2D subdiv = findSubdiv(filePath);
-	meanMask = makeTrianglePointsVector(subdiv);
-}
-
-vector<Point2f[3]>* Delaunay::makeTrianglePointsVector(Subdiv2D& subdiv)
-{
-	vector<Vec6f> in;
-	subdiv.getTriangleList(in);
-	vector<Point2f[3]>* out = new vector<Point2f[3]>(in.size());
-	int j = 0;
-	for (unsigned i = 0; i < in.size(); i++)
-	{
-		if (in[i][0] > 1000 || in[i][1] > 1000 || in[i][0] < 0 || in[i][1] < 0 ||
-			in[i][2] > 1000 || in[i][3] > 1000 || in[i][2] < 0 || in[i][3] < 0 ||
-			in[i][4] > 1000 || in[i][5] > 1000 || in[i][4] < 0 || in[i][5] < 0)
-		{
-		}
-		else
-		{
-			out->at(i)[0] = cv::Point(cvRound(in[i][0]), cvRound(in[i][1]));
-			out->at(i)[1] = cv::Point(cvRound(in[i][2]), cvRound(in[i][3]));
-			out->at(i)[2] = cv::Point(cvRound(in[i][4]), cvRound(in[i][5]));
-			//++j;
-		}
-	}
-	return out;
-}
-
-
-void Delaunay::warpTextureFromTriangles(Subdiv2D& srcSubDiv, Mat& originalImg, Mat& warp_final)
-{
-	Mat warp_mat(2, 3, CV_32FC1);
-	Mat warp_dst, warp_mask;
-	vector<Point2f[3]>* srcTri = makeTrianglePointsVector(srcSubDiv);
-	for (unsigned i = 4; i < srcTri->size(); i++)
-	{
-		warp_dst = Mat::zeros(originalImg.rows, originalImg.cols, originalImg.type());
-		warp_mask = Mat::zeros(originalImg.rows, originalImg.cols, originalImg.type());
-
-		//Affine Transform
-		warp_mat = cv::getAffineTransform(srcTri->at(i), meanMask->at(i));
-		std::cout << warp_mat << std::endl;
-		std::cout << meanMask->at(i)[0] << " " << meanMask->at(i)[1] << " " << meanMask->at(i)[2] << std::endl;
-		std::cout << srcTri->at(i)[0] << " " << srcTri->at(i)[1] << " " << srcTri->at(i)[2] << std::endl;
-		// Apply Transform to src
-		cv::warpAffine(originalImg, warp_dst, warp_mat, warp_dst.size());
-		cv::Point precious[3];
-		precious[0] = meanMask->at(i)[0];
-		precious[1] = meanMask->at(i)[1];
-		precious[2] = meanMask->at(i)[2];
-		cv::fillConvexPoly(warp_mask, precious, 3, CV_RGB(255, 255, 255), CV_AA, 0);
-		warp_dst.copyTo(warp_final, warp_mask);
-		cv::imshow("Final", warp_final);
-		cvWaitKey(100);
-	}
-	delete srcTri;
-}
-
 Subdiv2D Delaunay::findSubdiv(string filePath)
 {
 	Delaunay delau = Delaunay();
@@ -293,8 +226,6 @@ void Delaunay::drawSample(string filePath)
 {
 	help();
 
-	Delaunay delau = Delaunay();
-
 	Mat img = cv::imread(filePath + ".jpg", 1);
 	if (img.empty())
 	{
@@ -335,19 +266,13 @@ void Delaunay::drawSample(string filePath)
 		iss >> point.y;
 		point.y *= img.rows;
 		subdiv.insert(point);
+#if defined(_DEBUG)
+		cv::putText(img, std::to_string(i), point, CV_FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, Scalar::all(255));
+		locatePoint(img, point, subdiv);
 	}
-	delau.drawSubdiv(img, subdiv);
+	drawSubdiv(img, subdiv);
+#else
+	}
+#endif
 	cv::imshow(win, img);
-}
-
-void Delaunay::warpSample(string meanLoc, string testLoc)
-{
-	Mat testImg = cv::imread(testLoc + ".jpg", 1);
-	drawSample(meanLoc);
-	drawSample(testLoc);
-	Delaunay delau = Delaunay(meanLoc);
-	Subdiv2D test = delau.findSubdiv(testLoc);
-	Mat warp_final = Mat();
-	delau.warpTextureFromTriangles(test, testImg, warp_final);
-	cv::imshow("Final", warp_final);
 }
