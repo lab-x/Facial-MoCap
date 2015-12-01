@@ -5,11 +5,9 @@
 #pragma once
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
-#include <iostream>
-#include <fstream>
-#include <sstream>
 #include <string>
 #include "opencv\highgui.h"
+#include "TImage.h"
 
 //usings
 using std::vector;
@@ -44,7 +42,7 @@ public:
 	static void paintVoronoi(Mat& img, Subdiv2D& subdiv);
 
 	//Creates a subdivision based on annotation data
-	static Subdiv2D findSubdiv(string filePath);
+	static Subdiv2D findSubdiv(TImage* tImg);
 
 	//Provides a quick overview of the Delaunay functions when run.
 	static void help();

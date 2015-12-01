@@ -33,7 +33,10 @@
     <ClCompile Include="Delaunay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TrainingImage.cpp">
+    <ClCompile Include="AAM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,7 +47,10 @@
     <ClInclude Include="Delaunay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TrainingImage.h">
+    <ClInclude Include="AAM.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1491,5 +1497,10 @@
     <Image Include="..\..\media\IMM\40-6m.jpg">
       <Filter>Resource Files\Images</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\media\IMM\TrainingSet.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

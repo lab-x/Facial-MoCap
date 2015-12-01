@@ -6,6 +6,7 @@
 #include <sstream>
 #include <string>
 #include <opencv2\imgproc\types_c.h>
+#include "AAM.h"
 
 using namespace cv;
 using std::string;
@@ -15,12 +16,6 @@ static WebCam *cam = new WebCam(0);
 
 //Path to images and annotations
 const string path = "../../media/IMM/";
-
-//Annotation files used
-const string annotations[6] = {
-	"01-1m.asf", "01-2m.asf", "01-3m.asf",
-	"01-4m.asf", "01-5m.asf", "01-6m.asf"
-};
 
 void warpTextureFromTriangle(Point2f srcTri[3], Mat originalImage, Point2f dstTri[3], Mat warp_final)
 {
@@ -58,7 +53,7 @@ PCA loadPCA(Mat& pcaset)
 	pcaset = cv::Mat::eye(6, cols, CV_64F);
 	for (unsigned i = 0; i < 6; i++)
 	{
-		std::ifstream in(path + annotations[i]);
+		std::ifstream in(path);
 		int pointNum;
 		string line;
 		while (std::getline(in, line))
@@ -184,12 +179,12 @@ int main(int argc, char* argv[])
 	//Initialize capture of Webcam
 	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
 #pragma region Inital Face Finding
-	{
-		Delaunay::drawSample("../../media/IMM/01-1m");
-		Delaunay::drawSample("../../media/IMM/01-6m");
-		PCA pca = loadPCA(Mat());
-		Mat firstFrame = cam->getFrame();
-	}
+	AAM aam = AAM();
+	aam.buildAAM("../../media/IMM/");
+	Delaunay::drawSample("../../media/IMM/01-1m");
+	Delaunay::drawSample("../../media/IMM/01-6m");
+	PCA pca = loadPCA(Mat());
+	Mat firstFrame = cam->getFrame();
 #pragma endregion
 
 	while (1)

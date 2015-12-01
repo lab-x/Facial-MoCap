@@ -157,12 +157,14 @@
   <ItemGroup>
     <ClCompile Include="Delaunay.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="TrainingImage.cpp" />
+    <ClCompile Include="AAM.cpp" />
+    <ClCompile Include="TImage.cpp" />
     <ClCompile Include="WebCam.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Delaunay.h" />
-    <ClInclude Include="TrainingImage.h" />
+    <ClInclude Include="AAM.h" />
+    <ClInclude Include="TImage.h" />
     <ClInclude Include="WebCam.h" />
   </ItemGroup>
   <ItemGroup>
@@ -648,6 +650,9 @@
     <Image Include="..\..\media\IMM\40-4m.jpg" />
     <Image Include="..\..\media\IMM\40-5m.jpg" />
     <Image Include="..\..\media\IMM\40-6m.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\media\IMM\TrainingSet.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

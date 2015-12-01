@@ -125,46 +125,15 @@ void Delaunay::drawMask(Mat& img, int numFeatures)
 	cv::imshow(win, img);
 }
 
-Subdiv2D Delaunay::findSubdiv(string filePath)
+Subdiv2D Delaunay::findSubdiv(TImage* tImg)
 {
-	Delaunay delau = Delaunay();
-
-	Mat img = cv::imread(filePath + ".jpg", 1);
-	assert(!img.empty());
-	cv::Rect rect(0, 0, img.cols, img.rows);
-
+	const Mat* img = tImg->getImg();
+	const vector<Point2f>* points = tImg->getPoints();
+	cv::Rect rect(0, 0, img->cols, img->rows);
 	Subdiv2D subdiv(rect);
 
-	std::ifstream in(filePath + ".asf");
-	int pointNum;
-	std::string line;
-	while (std::getline(in, line))
-	{
-		if (line[0] != '#' && line != "")
-		{
-			std::istringstream iss(line);
-			iss >> pointNum;
-			break;
-		}
-	}
-	int tmp = 0;
-	for (unsigned i = 0; i < pointNum; i++)
-	{
-		while (std::getline(in, line))
-		{
-			if (line[0] != '#' && line != "")
-				break;
-		}
-		std::istringstream iss(line);
-		Point2f point;
-		iss >> tmp;
-		iss >> tmp;
-		iss >> point.x;
-		point.x *= img.cols;
-		iss >> point.y;
-		point.y *= img.rows;
-		subdiv.insert(point);
-	}
+	for (unsigned i = 0; i < points->size(); i++)
+		subdiv.insert(points->at(i));
 	return subdiv;
 }
 
