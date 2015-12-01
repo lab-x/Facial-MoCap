@@ -59,6 +59,12 @@ vector<Point2f>* const & TImage::getPoints()
 	return &points;
 }
 
+void TImage::loadWarpedImg(Mat warpedImg)
+{
+	this->warpedImg = warpedImg;
+	img.release();
+}
+
 int TImage::getRows()
 {
 	return img.rows;

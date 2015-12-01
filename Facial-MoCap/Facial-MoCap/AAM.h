@@ -46,7 +46,7 @@ public:
 	static int findPoint(float x, float y, vector<Point2f>* tImg);
 
 	//Finds the warp matrix of the input
-	Mat* warpToMean(TImage* img);
+	void warpToMean(TImage* img);
 private:
 	//Generates the mean model, usually from the first image in the TImage vector
 	// However could be altered to be more versatile.

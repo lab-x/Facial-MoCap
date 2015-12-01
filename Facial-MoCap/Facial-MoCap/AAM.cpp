@@ -36,36 +36,37 @@ int AAM::findPoint(float x, float y, vector<Point2f>* points)
 	return INT_MAX;
 }
 
-Mat * AAM::warpToMean(TImage * img)
+void AAM::warpToMean(TImage * img)
 {
 	int rows = img->getRows();
 	int cols = img->getCols();
 	vector<Point2f>* point = img->getPoints();
 	Mat warp_mat(2, 3, CV_32FC1);
 	Mat warp_dst, warp_mask;
+	Mat warp_final = Mat();
 	for (unsigned i = 0; i < meanModel.size(); i++)
 	{
 		warp_dst = Mat::zeros(rows, cols, img->getImg()->type());
 		warp_mask = Mat::zeros(rows, cols, img->getImg()->type());
 
-		Point2f src[3] = { point->at(meanModel[i](0)), point->at(meanModel[i](1)), point->at(meanModel[i](2))};
+		Point2f src[3] = { point->at(meanModel[i](0)), point->at(meanModel[i](1)), point->at(meanModel[i](2)) };
 		Point2f dest[3] = { meanPoints->at(meanModel[i](0)), meanPoints->at(meanModel[i](1)), meanPoints->at(meanModel[i](2)) };
 
 		//Affine Transform
 		warp_mat = cv::getAffineTransform(src, dest);
-		std::cout << warp_mat << std::endl;
 		// Apply Transform to src
 		cv::warpAffine(*img->getImg(), warp_dst, warp_mat, warp_dst.size());
-		cv::Point precious[3];
-		precious[0] = meanMask->at(i)[0];
-		precious[1] = meanMask->at(i)[1];
-		precious[2] = meanMask->at(i)[2];
+		cv::Point precious[3] = { dest[0], dest[1], dest[2] };
 		cv::fillConvexPoly(warp_mask, precious, 3, CV_RGB(255, 255, 255), CV_AA, 0);
 		warp_dst.copyTo(warp_final, warp_mask);
-		cv::imshow("Final", warp_final);
-		cvWaitKey(100);
+#if defined(_DEBUG)
+		//cv::imshow("Final", warp_final);
 	}
-	delete srcTri;
+	//cv::waitKey(10);
+#else
+	}
+#endif
+	img->loadWarpedImg(warp_final);
 }
 
 void AAM::generateMeanModel(TImage* img)
