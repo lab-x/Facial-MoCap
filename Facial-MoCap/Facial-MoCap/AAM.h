@@ -42,8 +42,11 @@ public:
 	// describing the files one wishes to use in the model.
 	void buildAAM(string filePath);
 
+	//Finds the point index number of the provided floats
 	static int findPoint(float x, float y, vector<Point2f>* tImg);
 
+	//Finds the warp matrix of the input
+	Mat* warpToMean(TImage* img);
 private:
 	//Generates the mean model, usually from the first image in the TImage vector
 	// However could be altered to be more versatile.
@@ -51,4 +54,5 @@ private:
 
 	//This vector holds the order of the triangle vertices and their point indeces for simple warping of triangles.
 	vector<Vec3i> meanModel;
+	vector<Point2f>* meanPoints;
 };

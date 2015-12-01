@@ -154,8 +154,6 @@ void Delaunay::runSample()
 
 	cv::Rect rect(0, 0, 600, 600);
 
-	Delaunay delau = Delaunay();
-
 	Subdiv2D subdiv(rect);
 	Mat img(rect.size(), CV_8UC3);
 
@@ -168,7 +166,7 @@ void Delaunay::runSample()
 		Point2f fp((float)(rand() % (rect.width - 10) + 5),
 			(float)(rand() % (rect.height - 10) + 5));
 
-		delau.locatePoint(img, fp, subdiv);
+		locatePoint(img, fp, subdiv);
 		imshow(win, img);
 
 		if (cv::waitKey(100) >= 0)
@@ -177,7 +175,7 @@ void Delaunay::runSample()
 		subdiv.insert(fp);
 
 		img = Scalar::all(0);
-		delau.drawSubdiv(img, subdiv);
+		drawSubdiv(img, subdiv);
 		imshow(win, img);
 
 		if (cv::waitKey(100) >= 0)
@@ -185,7 +183,7 @@ void Delaunay::runSample()
 	}
 
 	img = Scalar::all(0);
-	delau.paintVoronoi(img, subdiv);
+	paintVoronoi(img, subdiv);
 	imshow(win, img);
 
 	cv::waitKey(0);
