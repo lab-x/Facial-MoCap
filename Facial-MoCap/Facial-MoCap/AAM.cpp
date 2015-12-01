@@ -17,11 +17,11 @@ void AAM::buildAAM(string filePath)
 	std::cout << "Generating Mean Model";
 	generateMeanModel(imgs->at(0));
 	std::cout << "...Done" << std::endl;
-	std::cout << "Warp Images to Mean Model";
+	std::cout << "Warp Images to Mean Model:";
 	for (unsigned i = 0; i < imgs->size(); i++)
 	{
 		warpToMean(imgs->at(i));
-		std::cout << i;
+		std::cout << i << ", ";
 	}
 	std::cout << "...Done" << std::endl;
 }
