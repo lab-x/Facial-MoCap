@@ -17,12 +17,25 @@ void AAM::buildAAM(string filePath)
 	std::cout << "Generating Mean Model";
 	generateMeanModel(imgs->at(0));
 	std::cout << "...Done" << std::endl;
-	std::cout << "Warp Images to Mean Model:";
+	std::cout << "Warp Images to Mean Model and Add to PCA Set";
+	//Creates a matrix that has rows = #training images and cols = #features tracked
+	Mat pcaSet = Mat::eye(imgs->size(), meanPoints->size() * 2, CV_64F);
+	//Iterates through all training images warping and adding the feature points to the PCA set
 	for (unsigned i = 0; i < imgs->size(); i++)
 	{
+		std::cout << i << ": Warping";
 		warpToMean(imgs->at(i));
-		std::cout << i << ", ";
+		std::cout << "...Done; PCA Load";
+		loadPCAPoints(imgs->at(i)->getPoints(), pcaSet, i);
+		std::cout << "...Done\n";
 	}
+	std::cout << "...Done" << std::endl;
+	std::cout << "Create PCA Set";
+	shapeModel = PCA(pcaSet,				//pass the point data
+					Mat(),					//no pre-computed mean vector, let PCA engine compute
+					CV_PCA_DATA_AS_ROW,		//Data is stored as a row as the vectors span across columns
+					pcaSet.cols				//How many principal components to retain
+					);
 	std::cout << "...Done" << std::endl;
 }
 
@@ -60,13 +73,24 @@ void AAM::warpToMean(TImage * img)
 		cv::fillConvexPoly(warp_mask, precious, 3, CV_RGB(255, 255, 255), CV_AA, 0);
 		warp_dst.copyTo(warp_final, warp_mask);
 #if defined(_DEBUG)
-		//cv::imshow("Final", warp_final);
+		cv::imshow("Final", warp_final);
 	}
-	//cv::waitKey(10);
+	cv::waitKey(10);
 #else
 	}
 #endif
 	img->loadWarpedImg(warp_final);
+}
+
+void AAM::loadPCAPoints(const vector<Point2f>* points, Mat & pcaSet, unsigned index)
+{
+	//
+	for (unsigned i = 0; i < points->size(); i++)
+	{
+		points->at(i).x;
+		pcaSet.at<double>(index, i) = points->at(i).x;
+		pcaSet.at<double>(index, i+1) = points->at(i).y;
+	}
 }
 
 void AAM::generateMeanModel(TImage* img)

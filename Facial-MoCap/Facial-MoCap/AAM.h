@@ -28,6 +28,7 @@ under the License.
 using cv::Mat;
 using cv::Point2f;
 using cv::Vec3i;
+using cv::PCA;
 using std::vector;
 using std::string;
 
@@ -47,12 +48,18 @@ public:
 
 	//Finds the warp matrix of the input
 	void warpToMean(TImage* img);
+
 private:
 	//Generates the mean model, usually from the first image in the TImage vector
 	// However could be altered to be more versatile.
 	void generateMeanModel(TImage* img);
 
+	//Loads the point data into the PCA
+	void loadPCAPoints(const vector<Point2f>* points, Mat& pcaSet, unsigned index);
+
 	//This vector holds the order of the triangle vertices and their point indeces for simple warping of triangles.
 	vector<Vec3i> meanModel;
 	vector<Point2f>* meanPoints;
+
+	PCA shapeModel;
 };
