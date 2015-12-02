@@ -17,75 +17,6 @@ static WebCam *cam = new WebCam(0);
 //Path to images and annotations
 const string path = "../../media/IMM/";
 
-void warpTextureFromTriangle(Point2f srcTri[3], Mat originalImage, Point2f dstTri[3], Mat warp_final)
-{
-	Mat warp_mat(2, 3, CV_32FC1);
-	Mat warp_dst, warp_mask;
-	CvPoint trianglePoints[3];
-	trianglePoints[0] = dstTri[0];
-	trianglePoints[1] = dstTri[1];
-	trianglePoints[2] = dstTri[2];
-	warp_dst = Mat::zeros(originalImage.rows, originalImage.cols, originalImage.type());
-	warp_mask = Mat::zeros(originalImage.rows, originalImage.cols, originalImage.type());
-
-	for (int i = 0; i < 3; i++)
-	{
-		srcTri[i].x -= 190;
-		srcTri[i].y -= 250;
-		dstTri[i].x -= 190;
-		dstTri[i].y -= 250;
-	}
-
-	warp_mat = getAffineTransform(srcTri, dstTri);
-
-	//Apply affine transform just found to src img
-	Rect roi(190, 250, 240, 150);
-	Mat originalImageRoi = originalImage(roi);
-	Mat warp_dstRoi = warp_dst(roi);
-	warpAffine(originalImageRoi, warp_dstRoi, warp_mat, warp_dstRoi.size());
-	cvFillConvexPoly(new IplImage(warp_mask), trianglePoints, 3, CV_RGB(255, 255, 255), CV_AA, 0);
-	warp_dst.copyTo(warp_final, warp_mask);
-}
-
-PCA loadPCA(Mat& pcaset)
-{
-	int cols = 58 * 2;
-	pcaset = cv::Mat::eye(6, cols, CV_64F);
-	for (unsigned i = 0; i < 6; i++)
-	{
-		std::ifstream in(path);
-		int pointNum;
-		string line;
-		while (std::getline(in, line))
-		{
-			if (line[0] != '#' && line != "")
-			{
-				std::istringstream iss(line);
-				iss >> pointNum;
-				break;
-			}
-		}
-		int tmp = 0;
-		for (unsigned j = 0; j < 58 * 2; j += 2)
-		{
-			while (std::getline(in, line))
-			{
-				if (line[0] != '#' && line != "")
-					break;
-			}
-			std::istringstream iss(line);
-			iss >> tmp;
-			iss >> tmp;
-			iss >> pcaset.at<double>(i, j);
-			iss >> pcaset.at<double>(i, j + 1);
-		}
-	}
-	std::cout << pcaset << std::endl;
-
-	PCA pca(pcaset, cv::Mat(), CV_PCA_DATA_AS_ROW, pcaset.cols);
-	return pca;
-}
-
 void drawPts(Mat pcaset, PCA pca, PCA pcaTexture, std::vector<CvPoint>& pointsInsideHull, std::vector<int> triangleIndexes)
 {
 	int val1, val2, val3 = 50;
@@ -160,7 +91,7 @@ void drawPts(Mat pcaset, PCA pca, PCA pcaTexture, std::vector<CvPoint>& pointsIn
 				destPoints[j].x = back.at<double>(0, 2 * index);
 				destPoints[j].y = back.at<double>(0, 2 * index + 1);
 			}
-			warpTextureFromTriangle(sourcePoints, aamTexture, destPoints, img);
+			//warpTextureFromTriangle(sourcePoints, aamTexture, destPoints, img);
 		}
 
 		img.copyTo(imgFrame);
@@ -180,10 +111,9 @@ int main(int argc, char* argv[])
 	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
 #pragma region Inital Face Finding
 	AAM aam = AAM();
-	aam.buildAAM("../../media/IMM/");
-	Delaunay::drawSample("../../media/IMM/01-1m");
-	Delaunay::drawSample("../../media/IMM/01-6m");
-	PCA pca = loadPCA(Mat());
+	aam.buildAAM(path);
+	Delaunay::drawSample(path + "01-1m");
+	Delaunay::drawSample(path + "01-6m");
 	Mat firstFrame = cam->getFrame();
 #pragma endregion
 
@@ -203,5 +133,4 @@ int main(int argc, char* argv[])
 		}
 	}
 	return 0;
-
 }

@@ -17,7 +17,7 @@ void AAM::buildAAM(string filePath)
 	std::cout << "Generating Mean Model";
 	generateMeanModel(imgs->at(0));
 	std::cout << "...Done" << std::endl;
-	std::cout << "Warp Images to Mean Model and Add to PCA Set";
+	std::cout << "Warp Images to Mean Model and Add to PCA Set\n";
 	//Creates a matrix that has rows = #training images and cols = #features tracked
 	Mat pcaSet = Mat::eye(imgs->size(), meanPoints->size() * 2, CV_64F);
 	//Iterates through all training images warping and adding the feature points to the PCA set
@@ -84,10 +84,9 @@ void AAM::warpToMean(TImage * img)
 
 void AAM::loadPCAPoints(const vector<Point2f>* points, Mat & pcaSet, unsigned index)
 {
-	//
+	//Iterates through the points passed in and adds them to the pcaSet in order
 	for (unsigned i = 0; i < points->size(); i++)
 	{
-		points->at(i).x;
 		pcaSet.at<double>(index, i) = points->at(i).x;
 		pcaSet.at<double>(index, i+1) = points->at(i).y;
 	}
@@ -110,13 +109,13 @@ void AAM::generateMeanModel(TImage* img)
 			0 <= triangles[i][2] && 0 <= triangles[i][3] &&
 			0 <= triangles[i][4] && 0 <= triangles[i][5])
 		{
-			Vec3i vec = Vec3i();
-			vec[0] = findPoint(triangles[i][0], triangles[i][1], meanPoints);
-			vec[1] = findPoint(triangles[i][2], triangles[i][3], meanPoints);
-			vec[2] = findPoint(triangles[i][4], triangles[i][5], meanPoints);
-			meanModel.push_back(vec);
+		Vec3i vec = Vec3i();
+		vec[0] = findPoint(triangles[i][0], triangles[i][1], meanPoints);
+		vec[1] = findPoint(triangles[i][2], triangles[i][3], meanPoints);
+		vec[2] = findPoint(triangles[i][4], triangles[i][5], meanPoints);
+		meanModel.push_back(vec);
 #if defined(_DEBUG)
-			std::cout << std::endl << vec;
+		std::cout << std::endl << vec;
 #endif
 		}
 	}
