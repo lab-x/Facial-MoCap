@@ -43,23 +43,36 @@ public:
 	// describing the files one wishes to use in the model.
 	void buildAAM(string filePath);
 
-	//Finds the point index number of the provided floats
-	static int findPoint(float x, float y, vector<Point2f>* tImg);
-
 	//Finds the warp matrix of the input
-	void warpToMean(TImage* img);
+	Mat warpToMean(TImage* img);
 
 private:
-	//Generates the mean model, usually from the first image in the TImage vector
-	// However could be altered to be more versatile.
-	void generateMeanModel(TImage* img);
+	//Generates the mean model from the mean values of the PCA
+	void genMeanShapeModel(TImage * img, int cols, int rows);
+
+	void genMeanAppearanceModel(TImage * img, int cols, int rows);
 
 	//Loads the point data into the PCA
 	void loadPCAPoints(const vector<Point2f>* points, Mat& pcaSet, unsigned index);
+
+	//Loads the warped pixel data into the PCA set matrix
+	void loadPCAPixels(TImage* img, Mat& pcaSet, unsigned index);
+
+	//Finds the point index number of the provided floats
+	int findPoint(float x, float y, vector<Point2f>* tImg);
 
 	//This vector holds the order of the triangle vertices and their point indeces for simple warping of triangles.
 	vector<Vec3i> meanModel;
 	vector<Point2f>* meanPoints;
 
+
+	/*
+	These variables will be used as an offset for the matrix to avoid excess space usage.
+	The idea is to use the iteration during generateMeanModel to find the relevent maxes and mins of these values
+	then with this information the meanPoints are normalized to this new, smaller frame.
+	*/
+	int minX, minY, maxX, maxY;
+
 	PCA shapeModel;
+	PCA appearModel;
 };

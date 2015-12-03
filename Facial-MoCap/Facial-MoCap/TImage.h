@@ -54,8 +54,6 @@ public:
 	Mat* const& getImg();
 
 	vector<Point2f>* const& getPoints();
-	
-	void loadWarpedImg(Mat warpedImg);
 
 	int getRows();
 	int getCols();
@@ -69,8 +67,6 @@ private:
 
 	//Matrix that holds image data
 	Mat img;
-
-	Mat warpedImg;
 
 	//Vector of triangles in the image
 	vector<Point2f> points;

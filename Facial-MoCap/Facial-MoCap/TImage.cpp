@@ -8,7 +8,7 @@ TImage::TImage()
 TImage::TImage(string filePath)
 {
 #if defined(_DEBUG)
-	assert(!loadImg(&filePath));
+	assert(loadImg(&filePath));
 	assert(loadFeaturePoints(&filePath));
 #else
 	if (!loadImg(&filePath))
@@ -59,12 +59,6 @@ vector<Point2f>* const & TImage::getPoints()
 	return &points;
 }
 
-void TImage::loadWarpedImg(Mat warpedImg)
-{
-	this->warpedImg = warpedImg;
-	img.release();
-}
-
 int TImage::getRows()
 {
 	return img.rows;
@@ -80,6 +74,7 @@ bool TImage::loadImg(string* filePath)
 	img = cv::imread(*filePath + ".jpg", 1);
 	if (img.empty())
 		return false;
+	return true;
 }
 
 bool TImage::loadFeaturePoints(string * filePath)
