@@ -45,22 +45,28 @@ void AAM::buildAAM(string filePath)
 
 	{//Loads the relevant image points into the PCA set and finds the mean appearance
 		std::cout << "Warp and add to PCA Set";
-		//Creates a matrix that has rows = #training images and cols = #relevant pixels
-		int pcaCols = (maxX - minX) * (maxY - minY);
-		Mat pcaSet = Mat::eye(imgs->size(), pcaCols, CV_64F);
+		vector<Mat> warped = vector<Mat>();
 		for (unsigned i = 0; i < imgs->size(); i++)
-			loadPCAPixels(imgs->at(i), pcaSet, i);
+			warped.push_back(warpToMean(imgs->at(i)));
+		Mat pcaSet = asRowMatrix(warped, CV_64F);
 		std::cout << "...Done" << std::endl;
 		std::cout << "Create PCA Object";
 		appearModel = PCA(pcaSet,
 			Mat(),
 			CV_PCA_DATA_AS_ROW,
-			pcaSet.cols
+			10
 			);
 		std::cout << "...Done" << std::endl;
 		std::cout << "Generating Mean Appearance Model";
-		genMeanAppearanceModel();
+		meanAppearance = appearModel.mean.clone();
+		meanAppearance = norm_0_255(meanAppearance.reshape(1, rows));
 		std::cout << "...Done" << std::endl;
+#ifdef _DEBUG
+		cv::imshow("Avg", meanAppearance);
+		cv::imshow("pc1", norm_0_255(appearModel.eigenvectors.row(0)).reshape(1, rows));
+		cv::imshow("pc2", norm_0_255(appearModel.eigenvectors.row(1)).reshape(1, rows));
+		cv::imshow("pc3", norm_0_255(appearModel.eigenvectors.row(2)).reshape(1, rows));
+#endif
 	}
 	TImage::deleteAllTraining(imgs);
 }
@@ -130,17 +136,6 @@ void AAM::loadPCAPoints(const vector<Point2f>* points, Mat & pcaSet, unsigned in
 	}
 }
 
-void AAM::loadPCAPixels(TImage * img, Mat & pcaSet, unsigned index)
-{
-	Mat warped = warpToMean(img);
-	int k = 0;
-	cv::cvtColor(warped, meanAppearance, cv::COLOR_BGR2GRAY);
-	for (unsigned i = minY; i < maxY; i++)
-		for (unsigned j = minX; j < maxX; j++)
-			if(meanAppearance.at<uchar>(j,i) != 0)
-				pcaSet.at<double>(index, k++) = meanAppearance.at<uchar>(j, i);
-}
-
 void AAM::genMeanShapeModel(TImage* img, int cols, int rows)
 {
 	//Convenient use of a global variable
@@ -179,16 +174,56 @@ void AAM::genMeanShapeModel(TImage* img, int cols, int rows)
 	}
 }
 
-void AAM::genMeanAppearanceModel()
-{
-	int k = 0;
-	for (unsigned i = minY; i < maxY; i++)
-		for (unsigned j = minX; j < maxX; j++)
-		{
-			if (meanAppearance.at<uchar>(j, i) != 0)
-				meanAppearance.at<uchar>(j, i) = appearModel.mean.at<double>(0, k++);
+// Converts the images given in src into a row matrix.
+Mat AAM::asRowMatrix(const vector<Mat> src, int rtype, double alpha, double beta) {
+	// Number of samples:
+	size_t n = src.size();
+	// Return empty matrix if no matrices given:
+	if (n == 0)
+		return Mat();
+	// dimensionality of (reshaped) samples
+	size_t d = src[0].total();
+	// Create resulting data matrix:
+	Mat data(n, d, rtype);
+	// Now copy data:
+	for (int i = 0; i < n; i++) {
+		//
+		if (src[i].empty()) {
+			string error_message = cv::format("Image number %d was empty, please check your input data.", i);
+			CV_Error(CV_StsBadArg, error_message);
 		}
-#ifdef _DEBUG
-	cv::imshow("Mean Appearance", meanAppearance);
-#endif
+		// Make sure data can be reshaped, throw a meaningful exception if not!
+		if (src[i].total() != d) {
+			string error_message = cv::format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, d, src[i].total());
+			CV_Error(CV_StsBadArg, error_message);
+		}
+		// Get a hold of the current row:
+		Mat xi = data.row(i);
+		// Make reshape happy by cloning for non-continuous matrices:
+		if (src[i].isContinuous()) {
+			src[i].reshape(1, 1).convertTo(xi, rtype, alpha, beta);
+		}
+		else {
+			src[i].clone().reshape(1, 1).convertTo(xi, rtype, alpha, beta);
+		}
+	}
+	return data;
+}
+
+// Normalizes a given image into a value range between 0 and 255.
+Mat AAM::norm_0_255(const Mat& src) {
+	// Create and return normalized image:
+	Mat dst;
+	switch (src.channels()) {
+	case 1:
+		cv::normalize(src, dst, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+		break;
+	case 3:
+		cv::normalize(src, dst, 0, 255, cv::NORM_MINMAX, CV_8UC3);
+		break;
+	default:
+		src.copyTo(dst);
+		break;
+	}
+	return dst;
 }

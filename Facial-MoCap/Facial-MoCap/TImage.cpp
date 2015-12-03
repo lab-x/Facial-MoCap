@@ -79,7 +79,7 @@ int TImage::getCols()
 
 bool TImage::loadImg(string* filePath)
 {
-	img = cv::imread(*filePath + ".jpg", 1);
+	img = cv::imread(*filePath + ".jpg", cv::IMREAD_GRAYSCALE);
 	if (img.empty())
 		return false;
 	return true;
