@@ -31,8 +31,16 @@ vector<TImage*>* TImage::loadAllTraining(string filePath)
 	std::ifstream trainingSet(filePath + "TrainingSet.txt");
 	assert(!trainingSet.bad());
 	std::string faceSet;
+#ifdef _DEBUG
+	int k = 0;
+#endif
 	while (std::getline(trainingSet, faceSet))
 	{
+#ifdef _DEBUG
+		if (k > 10)
+			break;
+		++k;
+#endif
 		for (int i = 1; i <= 6; i++)
 		{
 			faceSet[3] = 0x30 + i;

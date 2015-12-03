@@ -3,6 +3,10 @@
 AAM::AAM()
 {
 	meanModel = vector<Vec3i>();
+	minX = INT_MAX;
+	minY = INT_MAX;
+	maxY = 0;
+	maxX = 0;
 }
 
 AAM::~AAM()
@@ -47,8 +51,15 @@ void AAM::buildAAM(string filePath)
 		for (unsigned i = 0; i < imgs->size(); i++)
 			loadPCAPixels(imgs->at(i), pcaSet, i);
 		std::cout << "...Done" << std::endl;
+		std::cout << "Create PCA Object";
+		appearModel = PCA(pcaSet,
+			Mat(),
+			CV_PCA_DATA_AS_ROW,
+			pcaSet.cols
+			);
+		std::cout << "...Done" << std::endl;
 		std::cout << "Generating Mean Appearance Model";
-		genMeanAppearanceModel(imgs->at(0), cols, rows);
+		genMeanAppearanceModel();
 		std::cout << "...Done" << std::endl;
 	}
 	TImage::deleteAllTraining(imgs);
@@ -57,18 +68,20 @@ void AAM::buildAAM(string filePath)
 int AAM::findPoint(float x, float y, vector<Point2f>* points)
 {
 	if (x > maxX)
-		maxX = x;
+		maxX = x+10;
 	else if (x < minX)
-		minX = x;
+		minX = x-10;
 	if (y > maxY)
 		maxY = y;
 	else if (y < minY)
 		minY = y;
+
+
 	for (unsigned i = 0; i < points->size(); i++)
-	{
 		if (points->at(i).x == x && points->at(i).y == y)
 			return i;
-	}
+
+
 	return INT_MAX;
 }
 
@@ -120,8 +133,12 @@ void AAM::loadPCAPoints(const vector<Point2f>* points, Mat & pcaSet, unsigned in
 void AAM::loadPCAPixels(TImage * img, Mat & pcaSet, unsigned index)
 {
 	Mat warped = warpToMean(img);
-	for (unsigned j = minY; j < maxY; j++)
-		pcaSet.at<double>(index, j);
+	int k = 0;
+	cv::cvtColor(warped, meanAppearance, cv::COLOR_BGR2GRAY);
+	for (unsigned i = minY; i < maxY; i++)
+		for (unsigned j = minX; j < maxX; j++)
+			if(meanAppearance.at<uchar>(j,i) != 0)
+				pcaSet.at<double>(index, k++) = meanAppearance.at<uchar>(j, i);
 }
 
 void AAM::genMeanShapeModel(TImage* img, int cols, int rows)
@@ -162,7 +179,16 @@ void AAM::genMeanShapeModel(TImage* img, int cols, int rows)
 	}
 }
 
-void AAM::genMeanAppearanceModel(TImage * img, int cols, int rows)
+void AAM::genMeanAppearanceModel()
 {
-
+	int k = 0;
+	for (unsigned i = minY; i < maxY; i++)
+		for (unsigned j = minX; j < maxX; j++)
+		{
+			if (meanAppearance.at<uchar>(j, i) != 0)
+				meanAppearance.at<uchar>(j, i) = appearModel.mean.at<double>(0, k++);
+		}
+#ifdef _DEBUG
+	cv::imshow("Mean Appearance", meanAppearance);
+#endif
 }

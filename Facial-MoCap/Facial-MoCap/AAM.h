@@ -50,7 +50,7 @@ private:
 	//Generates the mean model from the mean values of the PCA
 	void genMeanShapeModel(TImage * img, int cols, int rows);
 
-	void genMeanAppearanceModel(TImage * img, int cols, int rows);
+	void genMeanAppearanceModel();
 
 	//Loads the point data into the PCA
 	void loadPCAPoints(const vector<Point2f>* points, Mat& pcaSet, unsigned index);
@@ -65,6 +65,7 @@ private:
 	vector<Vec3i> meanModel;
 	vector<Point2f>* meanPoints;
 
+	Mat meanAppearance;
 
 	/*
 	These variables will be used as an offset for the matrix to avoid excess space usage.
