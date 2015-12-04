@@ -55,7 +55,7 @@ void AAM::buildAAM(string filePath)
 		appearModel = PCA(pcaSet,
 			Mat(),
 			CV_PCA_DATA_AS_ROW,
-			pcaSet.cols
+			10
 			);
 		std::cout << "...Done" << std::endl;
 		std::cout << "Generating Mean Appearance Model";
@@ -68,13 +68,13 @@ void AAM::buildAAM(string filePath)
 int AAM::findPoint(float x, float y, vector<Point2f>* points)
 {
 	if (x > maxX)
-		maxX = x+10;
+		maxX = x+15;
 	else if (x < minX)
-		minX = x-10;
+		minX = x-30;
 	if (y > maxY)
-		maxY = y;
+		maxY = y + 15;
 	else if (y < minY)
-		minY = y;
+		minY = y - 15;
 
 
 	for (unsigned i = 0; i < points->size(); i++)
@@ -190,5 +190,8 @@ void AAM::genMeanAppearanceModel()
 		}
 #ifdef _DEBUG
 	cv::imshow("Mean Appearance", meanAppearance);
+	//cv::imshow("pc1", appearModel.eigenvectors.row(0).reshape(1, meanAppearance.rows));
+	//cv::imshow("pc2", appearModel.eigenvectors.row(1).reshape(1, meanAppearance.rows));
+	//cv::imshow("pc3", appearModel.eigenvectors.row(2).reshape(1, meanAppearance.rows));
 #endif
 }

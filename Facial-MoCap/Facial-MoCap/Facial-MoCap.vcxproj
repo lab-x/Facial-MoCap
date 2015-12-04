@@ -156,7 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Delaunay.cpp" />
-    <ClCompile Include="glAnthropometric3DModel.cpp" />
+    <ClCompile Include="FaceModel.cpp" />
     <ClCompile Include="JaPOSIT.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="AAM.cpp" />
@@ -166,6 +166,7 @@
   <ItemGroup>
     <ClInclude Include="Delaunay.h" />
     <ClInclude Include="AAM.h" />
+    <ClInclude Include="FaceModel.h" />
     <ClInclude Include="JaPOSIT.h" />
     <ClInclude Include="TImage.h" />
     <ClInclude Include="WebCam.h" />

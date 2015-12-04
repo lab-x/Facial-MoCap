@@ -42,7 +42,7 @@
     <ClCompile Include="JaPOSIT.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="glAnthropometric3DModel.cpp">
+    <ClCompile Include="FaceModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -60,6 +60,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="JaPOSIT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
