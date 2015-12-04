@@ -39,6 +39,12 @@
     <ClCompile Include="TImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="JaPOSIT.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="glAnthropometric3DModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WebCam.h">
@@ -51,6 +57,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="TImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="JaPOSIT.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
