@@ -23,101 +23,11 @@ static FaceModel *face = new FaceModel();
 //Path to images and annotations
 const string path = "../../media/IMM/";
 
-void drawPts(Mat pcaset, PCA pca, PCA pcaTexture, std::vector<CvPoint>& pointsInsideHull, std::vector<int> triangleIndexes)
-{
-	int val1, val2, val3 = 50;
-	int alphaMax = 100;
-	int imageCount = 1;
-
-	char fileName[100];
-
-	Mat coeffs = Mat::zeros(1, 3, CV_64F);
-
-	namedWindow("AAM");
-
-	cv::Mat imgFrame = imread(fileName);
-	int t, ellap;
-
-	while (1)
-	{
-
-		Mat img = cam->getFrame();
-
-		createTrackbar("eigen1", "AAM", &val1, alphaMax);
-		createTrackbar("eigen2", "AAM", &val2, alphaMax);
-		createTrackbar("eigen3", "AAM", &val3, alphaMax);
-
-		coeffs.at<double>(0, 0) = ((val1 * 1.0 / alphaMax) - 0.5) * 2 * 3 * sqrt(pca.eigenvalues.at<double>(0, 0));
-		coeffs.at<double>(0, 1) = ((val2 * 1.0 / alphaMax) - 0.5) * 2 * 3 * sqrt(pca.eigenvalues.at<double>(1, 0));
-		coeffs.at<double>(0, 2) = ((val3 * 1.0 / alphaMax) - 0.5) * 2 * 3 * sqrt(pca.eigenvalues.at<double>(2, 0));
-
-		Mat back;
-		Mat backTexture;
-		Mat aamTexture = Mat::zeros(480, 640, imgFrame.type());
-
-		pca.backProject(coeffs, back);
-		pcaTexture.backProject(coeffs, backTexture);
-
-		for (unsigned i = 0; i < pointsInsideHull.size(); i++)
-		{
-			//Traces the three points for each triple pair of vertices, checking if already evaluated
-			for (unsigned j = 0; j < 3;)
-			{
-				double v = ((backTexture.at<double>(0, 3 * i + j)) * 255);
-				v = (v > 255) ? 255 : v;
-				v = (v < 0) ? 0 : v;
-				aamTexture.at<Vec3b>(pointsInsideHull.at(i))[j] = v;
-			}
-		}
-		imshow("AAM Texture", aamTexture);
-
-		//draw aam
-		for (unsigned j = 0; j < (back.cols / 2) - 1; j++)
-		{
-			Point2f p(back.at<double>(0, 2 * j), back.at<double>(0, 2 * j + 1));
-			Point2f p2(back.at<double>(0, 2 * j + 2), back.at<double>(0, 2 * j + 3));
-			line(img, p, p2, CV_RGB(255, 0, 0), 3, 8, 0);
-			circle(img, p, 4, CV_RGB(128, 0, 0), -1, 8);
-			circle(img, p2, 4, CV_RGB(128, 0, 0), -1, 8);
-		}
-
-		//warp the generated texture to give a 3D view on a person's face
-		for (unsigned i = 0; i < triangleIndexes.size() / 3; i++)
-		{
-			Point2f sourcePoints[3];
-			Point2f destPoints[3];
-			for (unsigned j = 0; j < 3; j++)
-			{
-				int index = triangleIndexes.at(3 * i + j);
-
-				sourcePoints[j].x = pca.mean.at<double>(0, 2 * index);
-				sourcePoints[j].y = pca.mean.at<double>(0, 2 * index + 1);
-				destPoints[j].x = back.at<double>(0, 2 * index);
-				destPoints[j].y = back.at<double>(0, 2 * index + 1);
-			}
-			//warpTextureFromTriangle(sourcePoints, aamTexture, destPoints, img);
-		}
-
-		img.copyTo(imgFrame);
-		imshow("AAM", imgFrame);
-		char c = waitKey(10);
-		if (c == 'c') break;
-		if (c == '1') imageCount = 1;
-		if (c == '2') imageCount = 2;
-		if (c == '3') imageCount = 3;
-
-	}
-}
-
-
 //OpenGL Display Routine
 void Display(void) {
 	int k;
 
 	glClear(GL_COLOR_BUFFER_BIT);
-
-
-
 
 	glPushMatrix();
 
@@ -127,22 +37,13 @@ void Display(void) {
 	glRotatef(face->FacePitch, 0, 1, 0);
 	glRotatef(face->FaceYaw, 1, 0, 0);
 
-
 	face->Anthropometric3DModel(3);
 
 	face->DrawAxes(5, 0.1);
 
 	glPopMatrix();
 
-
-
-
 	glutSwapBuffers();
-
-
-	//Read From FrameBuffer
-	glReadPixels(0, 0, face->Image->width, face->Image->height, GL_BGR, GL_UNSIGNED_BYTE, face->Image->imageData);
-
 }
 
 //OpenGL Idle Function
@@ -158,14 +59,10 @@ void Visible(int vis) {
 		glutIdleFunc(NULL);
 }
 
+#ifdef _DEBUG
 void KeyboardHandler(unsigned char Key, int x, int y) {
 
 	switch (Key) {
-
-	case 27: 	cvReleaseImage(&face->Image);
-		cvDestroyWindow("Image");
-		exit(0); break;
-
 
 	case 'r': face->WorldRoll += 5; break;
 	case 'R': face->WorldRoll -= 5; break;
@@ -197,29 +94,11 @@ void KeyboardHandler(unsigned char Key, int x, int y) {
 
 	case '+': face->FaceTz += 0.5; break;
 	case '-': face->FaceTz -= 0.5; break;
-
-
-
-
-	case 's':	cvFlip(face->Image, face->Image);
-		cvShowImage("Image", face->Image);
-		cvWaitKey(50);
-		char Buffer[50];
-		static int FrameIndex = 0;
-		cvSaveImage(Buffer, face->Image);
-		break;
-
-
-
 	}
-
-
-
 
 	glRotatef(face->WorldRoll, 0, 0, 1);
 	glRotatef(face->WorldPitch, 0, 1, 0);
 	glRotatef(face->WorldYaw, 1, 0, 0);
-
 
 	face->WorldRoll = 0;
 	face->WorldPitch = 0;
@@ -247,6 +126,7 @@ void SpecialKeyboardHandler(int Key, int x, int y) {
 
 	glutPostRedisplay();
 }
+#endif
 
 //Reshape Window Handler
 void ReshapeWindow(GLsizei w, GLsizei h) {
@@ -270,32 +150,64 @@ void ReshapeWindow(GLsizei w, GLsizei h) {
 }
 
 
-int main(int argc, char* argv[])
-{
-	//Initialize capture of Webcam
-	namedWindow("Face Tracker", CV_WINDOW_AUTOSIZE); //create a window
-#pragma region Inital Face Finding
-	AAM aam = AAM();
-	aam.buildAAM(path);
-	Delaunay::drawSample(path + "01-1m");
-	Delaunay::drawSample(path + "01-6m");
-	Mat firstFrame = cam->getFrame();
-#pragma endregion
+//int main(int argc, char* argv[])
+//{
+//	//Pulls in training image for creation of AAM
+//	AAM aam = AAM();
+//	aam.buildAAM(path);
+//	
+//	//Sample delaney drawing on pre-annotated images
+//	Delaunay::drawSample(path + "01-1m");
+//	Delaunay::drawSample(path + "01-6m");
+//
+//	//Gets one frame from the camera
+//	Mat firstFrame = cam->getFrame();
+//
+//	while (1)
+//	{
+//		//Captures the current frame
+//		Mat frame = cam->getFrame();
+//
+//		//show the frame in "Face Tracker" window
+//		imshow("Face Tracker", frame);
+//
+//		//wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
+//		if (waitKey(30) == 27)
+//		{
+//			std::cout << "esc key is pressed by user" << std::endl;
+//			break;
+//		}
+//	}
+//	return 0;
+//}
 
-	while (1)
-	{
-		//Where captured frame resides
-		Mat frame = cam->getFrame();
+int main(int argc, char** argv) {
 
-		//show the frame in "Face Tracker" window
-		imshow("Face Tracker", frame);
+	glutInit(&argc, argv);
 
-		//wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-		if (waitKey(30) == 27)
-		{
-			std::cout << "esc key is pressed by user" << std::endl;
-			break;
-		}
-	}
+	//Init OpenGL With Double Buffer in RGB Mode
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+
+	glutInitWindowSize(800, 600);
+
+	glutCreateWindow("3D Model");
+
+	//Set Display Handler
+	glutDisplayFunc(Display);
+
+#ifdef _DEBUG
+	//Set Keyboard Handler
+	glutKeyboardFunc(KeyboardHandler);
+	glutSpecialFunc(SpecialKeyboardHandler);
+#endif
+
+	glutReshapeFunc(ReshapeWindow);
+	glutVisibilityFunc(Visible);
+
+	face->Init();
+
+	//OpenGL Main Loop
+	glutMainLoop();
+
 	return 0;
 }
