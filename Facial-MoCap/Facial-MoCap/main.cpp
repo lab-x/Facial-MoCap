@@ -166,7 +166,7 @@ int main(int argc, char* argv[])
 	posit->init(face);
 
 	//Sample delaney drawing on pre-annotated images
-	//Delaunay::drawSample(path + "01-1m");
+	Delaunay::drawSample(path + "35-1f");
 
 	//Gets one frame from the camera
 	Mat firstFrame = cam->getFrame();
