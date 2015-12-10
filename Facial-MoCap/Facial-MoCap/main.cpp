@@ -17,8 +17,12 @@ static FaceModel *face = new FaceModel();
 
 static JaPOSIT *posit = new JaPOSIT();
 
+vector<TImage*>* points;
+
 //Path to images and annotations
 const string path = "../../media/IMM/";
+
+int index = 0;
 
 //OpenGL Display Routine
 void Display(void) {
@@ -44,6 +48,10 @@ void Display(void) {
 	glPopMatrix();
 
 	glutSwapBuffers();
+
+	posit->loadWithPoints(*points->at(index)->getPoints(), *points->at(index)->getImg());
+
+	cv::imshow("POSIT Test", *points->at(index)->getImg());
 
 	//Captures the current frame
 	Mat frame = cam->getFrame();
@@ -84,7 +92,7 @@ void KeyboardHandler(unsigned char Key, int x, int y) {
 
 
 	case '7': face->FaceRoll += 2; break;
-	case '1': face->FaceRoll -= 2; break;
+	case '1': ++index; break;
 
 	case '9': face->FacePitch += 2; break;
 	case '3': face->FacePitch -= 2; break;
@@ -96,7 +104,7 @@ void KeyboardHandler(unsigned char Key, int x, int y) {
 	case '4': face->FaceTx -= 0.5; break;
 
 	case '8': face->FaceTy += 0.5; break;
-	case '2': face->FaceTy -= 0.5; break;
+	case '2': --index; break;
 
 	case '+': face->FaceTz += 0.5; break;
 	case '-': face->FaceTz -= 0.5; break;
@@ -166,7 +174,7 @@ int main(int argc, char* argv[])
 	posit->init(face);
 
 	//Sample delaney drawing on pre-annotated images
-	Delaunay::drawSample(path + "35-1f");
+	//Delaunay::drawSample(path + "35-1f");
 
 	//Gets one frame from the camera
 	Mat firstFrame = cam->getFrame();
@@ -191,11 +199,7 @@ int main(int argc, char* argv[])
 
 	face->Init();
 
-	TImage img(path + "01-1m");
-
-	cv::imshow("POSIT Test", *img.getImg());
-
-	posit->loadWithPoints(*img.getPoints(), *img.getImg());
+	points = TImage::loadAllTraining(path);
 
 	//OpenGL Main Loop
 	glutMainLoop();

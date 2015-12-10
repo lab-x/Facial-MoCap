@@ -98,8 +98,8 @@ void JaPOSIT::loadWithPoints(vector<Point2f> imgPoints, Mat & img)
 double* JaPOSIT::getOpenGLMatrix()
 {
 	double d[16] = { rot[0], rot[1], rot[2], 0,
-		rot[3], rot[4], rot[5], 0,
-		rot[6], rot[7], rot[8], 0,
-		0,		0,		0,		 1 };
+					 rot[3], rot[4], rot[5], 0,
+					 rot[6], rot[7], rot[8], 0,
+					 0,		 0,		 0,		 1 };
 	return d;
 }
