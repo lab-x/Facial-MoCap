@@ -49,10 +49,11 @@ void Display(void) {
 
 	glutSwapBuffers();
 
+#ifdef _DEBUG
 	posit->loadWithPoints(*points->at(index)->getPoints(), *points->at(index)->getImg());
 
 	cv::imshow("POSIT Test", *points->at(index)->getImg());
-
+#endif
 	//Captures the current frame
 	Mat frame = cam->getFrame();
 
@@ -199,10 +200,13 @@ int main(int argc, char* argv[])
 
 	face->Init();
 
+#ifdef _DEBUG
 	points = TImage::loadAllTraining(path);
+#endif
+
+	face->WorldYaw = 180.0f;
 
 	//OpenGL Main Loop
 	glutMainLoop();
-
 	return 0;
 }
