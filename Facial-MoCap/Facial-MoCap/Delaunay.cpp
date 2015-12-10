@@ -234,7 +234,7 @@ void Delaunay::drawSample(string filePath)
 		point.y *= img.rows;
 		subdiv.insert(point);
 #if defined(_DEBUG)
-		cv::putText(img, std::to_string(point.y), point, CV_FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, Scalar::all(255));
+		//cv::putText(img, std::to_string(point.y), point, CV_FONT_HERSHEY_SCRIPT_SIMPLEX, 0.5, Scalar::all(255));
 		locatePoint(img, point, subdiv);
 	}
 	drawSubdiv(img, subdiv);

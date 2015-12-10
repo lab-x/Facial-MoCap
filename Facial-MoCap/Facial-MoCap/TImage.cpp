@@ -37,7 +37,7 @@ vector<TImage*>* TImage::loadAllTraining(string filePath)
 	while (std::getline(trainingSet, faceSet))
 	{
 #ifdef _DEBUG
-		if (k > 10)
+		if (k > 5)
 			break;
 		++k;
 #endif
