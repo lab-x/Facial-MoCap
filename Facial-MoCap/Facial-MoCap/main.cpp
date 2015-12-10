@@ -33,6 +33,8 @@ void Display(void) {
 	glPushMatrix();
 	glTranslatef(face->FaceTx, face->FaceTy, face->FaceTz);
 
+	gluLookAt(0, 0, 0, 0, 0, 1, 0, -1, 0);
+
 	//These are only used for manual manipulation
 	//glRotatef(face->FaceRoll, 0, 0, 1);
 	//glRotatef(face->FacePitch, 0, 1, 0);
@@ -188,7 +190,6 @@ int main(int argc, char* argv[])
 	glutCreateWindow("3D Model");
 
 	glutDisplayFunc(Display);
-
 #ifdef _DEBUG
 	//Set Keyboard Handler
 	glutKeyboardFunc(KeyboardHandler);
@@ -203,8 +204,6 @@ int main(int argc, char* argv[])
 #ifdef _DEBUG
 	points = TImage::loadAllTraining(path);
 #endif
-
-	face->WorldYaw = 180.0f;
 
 	//OpenGL Main Loop
 	glutMainLoop();
