@@ -3,14 +3,9 @@
 #include <GL/glut.h>
 #include "opencv\highgui.h"
 #include "WebCam.h"
-#include "Delaunay.h"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <opencv2\imgproc\types_c.h>
 #include "AAM.h"
 #include "FaceModel.h"
+#include "JaPOSIT.h"
 
 using namespace cv;
 using std::string;
@@ -19,6 +14,8 @@ using std::string;
 static WebCam *cam = new WebCam(0);
 
 static FaceModel *face = new FaceModel();
+
+static JaPOSIT *posit = new JaPOSIT();
 
 //Path to images and annotations
 const string path = "../../media/IMM/";
@@ -30,12 +27,15 @@ void Display(void) {
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glPushMatrix();
-
 	glTranslatef(face->FaceTx, face->FaceTy, face->FaceTz);
 
-	glRotatef(face->FaceRoll, 0, 0, 1);
-	glRotatef(face->FacePitch, 0, 1, 0);
-	glRotatef(face->FaceYaw, 1, 0, 0);
+	//These are only used for manual manipulation
+	//glRotatef(face->FaceRoll, 0, 0, 1);
+	//glRotatef(face->FacePitch, 0, 1, 0);
+	//glRotatef(face->FaceYaw, 1, 0, 0);
+
+	//Retrieves the calcuated rotation matrix from the algorithm for use in OpenGL
+	glMultMatrixd(posit->getOpenGLMatrix());
 
 	face->Anthropometric3DModel(3);
 
@@ -44,6 +44,12 @@ void Display(void) {
 	glPopMatrix();
 
 	glutSwapBuffers();
+
+	//Captures the current frame
+	Mat frame = cam->getFrame();
+
+	//show the frame in "Face Tracker" window
+	imshow("Face Tracker", frame);
 }
 
 //OpenGL Idle Function
@@ -150,49 +156,28 @@ void ReshapeWindow(GLsizei w, GLsizei h) {
 }
 
 
-//int main(int argc, char* argv[])
-//{
-//	//Pulls in training image for creation of AAM
-//	AAM aam = AAM();
-//	aam.buildAAM(path);
-//	
-//	//Sample delaney drawing on pre-annotated images
-//	Delaunay::drawSample(path + "01-1m");
-//	Delaunay::drawSample(path + "01-6m");
-//
-//	//Gets one frame from the camera
-//	Mat firstFrame = cam->getFrame();
-//
-//	while (1)
-//	{
-//		//Captures the current frame
-//		Mat frame = cam->getFrame();
-//
-//		//show the frame in "Face Tracker" window
-//		imshow("Face Tracker", frame);
-//
-//		//wait for 'esc' key press for 30ms. If 'esc' key is pressed, break loop
-//		if (waitKey(30) == 27)
-//		{
-//			std::cout << "esc key is pressed by user" << std::endl;
-//			break;
-//		}
-//	}
-//	return 0;
-//}
+int main(int argc, char* argv[])
+{
+	//Pulls in training image for creation of AAM
+	//AAM aam = AAM();
+	//aam.buildAAM(path);
+	
+	//Initializes the structure with the face object pointer
+	posit->init(face);
 
-int main(int argc, char** argv) {
+	//Sample delaney drawing on pre-annotated images
+	//Delaunay::drawSample(path + "01-1m");
+
+	//Gets one frame from the camera
+	Mat firstFrame = cam->getFrame();
 
 	glutInit(&argc, argv);
-
-	//Init OpenGL With Double Buffer in RGB Mode
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 
 	glutInitWindowSize(800, 600);
 
 	glutCreateWindow("3D Model");
 
-	//Set Display Handler
 	glutDisplayFunc(Display);
 
 #ifdef _DEBUG
@@ -205,6 +190,12 @@ int main(int argc, char** argv) {
 	glutVisibilityFunc(Visible);
 
 	face->Init();
+
+	TImage img(path + "01-1m");
+
+	cv::imshow("POSIT Test", *img.getImg());
+
+	posit->loadWithPoints(*img.getPoints(), *img.getImg());
 
 	//OpenGL Main Loop
 	glutMainLoop();

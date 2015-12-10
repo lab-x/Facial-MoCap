@@ -52,7 +52,7 @@
 #define deg2rad(Theta) (Theta)*PI/180
 
 using cv::Mat;
-using cv::Vec3d;
+using cv::Point3f;
 using std::vector;
 
 class FaceModel
@@ -68,7 +68,7 @@ public:
 
 	void DrawAxes(float Size, float Radius);
 
-	const vector<Vec3d>* getFeatures();
+	const vector<Point3f>* getFeatures();
 
 	//Set Texture Mapping Parameters
 	void Init(void);
@@ -76,7 +76,7 @@ public:
 	GLfloat WorldTx = 0, WorldTy = 0, WorldTz = 0, WorldRoll = 0, WorldPitch = 0, WorldYaw = 0;
 	GLfloat FaceTx = 0, FaceTy = 0, FaceTz = 0, FaceRoll = 0, FacePitch = 0, FaceYaw = 0;
 private:
-	static const vector<Vec3d> Model3D;
+	static const vector<Point3f> Model3D;
 	static const int MeanDelaunayTriangles[95][3];
 	GLUquadricObj*Quadric = gluNewQuadric();
 };
